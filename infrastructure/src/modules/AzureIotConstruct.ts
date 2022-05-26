@@ -1,26 +1,24 @@
 import { Construct } from 'constructs'
-import { Eventhub, EventhubNamespace, EventhubAuthorizationRule, Iothub, IothubEndpointEventhub, IothubRouteA, IothubEnrichmentA, ResourceGroup } from "../../.gen/providers/azurerm"
+import { Eventhub, EventhubNamespace, EventhubAuthorizationRule, Iothub, IothubEndpointEventhub, IothubRouteA, IothubEnrichmentA, ResourceGroup, IothubSharedAccessPolicyA } from "../../.gen/providers/azurerm"
 import { StringResource } from '@cdktf/provider-random'
 
-import { DataExternal } from "../../.gen/providers/external";
-import { TerraformOutput } from 'cdktf';
-import path = require('path');
 
-export interface IoTConfig {
+export interface AzureIoTConfig {
     readonly prefix: string
     readonly environment: string
     readonly resourceGroup: ResourceGroup
 }
 
-export class IotConstruct extends Construct {
+export class AzureIotConstruct extends Construct {
     public readonly iothub: Iothub;
     public readonly eventhub: Eventhub;
-    public readonly deviceKey: string;
+    public readonly iothubPrimaryConnectionString: string;
+    public readonly eventhubPrimaryConnectionString: string;
 
     constructor(
         scope: Construct,
         name: string,
-        config: IoTConfig
+        config: AzureIoTConfig
     ) {
         super(scope, name)
 
@@ -53,6 +51,7 @@ export class IotConstruct extends Construct {
             manage: true
         })
 
+        this.eventhubPrimaryConnectionString = azureFunctionEventhubAuthorizationRule.primaryConnectionString
 
         this.iothub = new Iothub(this, "Iothub", {
             name: config.prefix + "Iothub",
@@ -112,19 +111,19 @@ export class IotConstruct extends Construct {
             endpointNames: [iothubEndpointEventhub.name]
         })
 
-        const psScriptPath = path.join(__dirname, "GetDeviceKey.ps1");
-        const deviceKeyExternal = new DataExternal(this, "DeviceKeyExternal", {
-            program: ["PowerShell", psScriptPath],
-            query: {
-                resourceGroup: config.resourceGroup.name,
-                iotHubName: this.iothub.name
-            }
+        const iothubSharedAccessPolicyA = new IothubSharedAccessPolicyA(this, "IothubSharedAccessPolicyA", {
+            name: config.prefix + "IothubSharedAccessPolicy",
+            resourceGroupName: config.resourceGroup.name,
+            iothubName: this.iothub.name,
+            registryRead: true,
+            registryWrite: true,
+            serviceConnect: true,
+            deviceConnect: true,
         })
-        this.deviceKey = deviceKeyExternal.result.lookup("deviceKey")
 
-        new TerraformOutput(this, "deviceKey", {
-            value: this.deviceKey          
-        });
+        this.iothubPrimaryConnectionString = iothubSharedAccessPolicyA.primaryConnectionString
+
+
 
     }
 }
