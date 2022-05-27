@@ -10,12 +10,11 @@ public class Config
     {
         AzureWebJobsStorage,
         IotHubPrimaryConnectionString,
-        EventHubPrimaryConnectionString,
-        EventHubName,
         IotHubName,
         Environment,
         StorageAccountName,
-        StorageAccountKey
+        StorageAccountKey,
+        DeviceId
     }
 
     private readonly IConfigurationRoot _config;

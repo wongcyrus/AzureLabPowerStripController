@@ -36,6 +36,7 @@ class PowerControlStack extends TerraformStack {
       prefix,
       resourceGroup,
     })
+    azureIotDeviceConstruct.node.addDependency(azureIotConstruct)
 
     const appSettings = {
       "IotHubPrimaryConnectionString": azureIotConstruct.iothubPrimaryConnectionString,

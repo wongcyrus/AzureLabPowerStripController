@@ -86,7 +86,7 @@ export class AzureIotEventHubConstruct extends AzureIotConstruct {
             resourceGroupName: config.resourceGroup.name,
         })
 
-        new IothubEnrichmentA(this, "IothubEnrichmentA", {
+        new IothubEnrichmentA(this, "IothubEnrichmentWithTenant", {
             iothubName: this.iothub.name,
             resourceGroupName: config.resourceGroup.name,
             key: "tenant",
