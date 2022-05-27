@@ -20,9 +20,7 @@ namespace PowerStripControllerFunctionApp
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ExecutionContext context,
             ILogger log)
-        {
-           
-
+        { 
             string device = req.Query["device"];
             string powerOn = req.Query["powerOn"];
 

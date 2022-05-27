@@ -2,9 +2,10 @@ import { Construct } from "constructs";
 import { App, TerraformOutput, TerraformStack } from "cdktf";
 import { AzurermProvider, ResourceGroup } from "../.gen/providers/azurerm";
 
-import { AzureIotEventHubConstruct } from "./modules/AzureIotEventHubConstruct"
 import { AzureIotDeviceConstruct } from "./modules/AzureIoTDeviceConstruct";
 import { AzureFunctionLinuxConstruct } from "./modules/AzureFunctionLinuxConstruct";
+import { AzureIotConstruct } from "./modules/AzureIotConstruct";
+// import { AzureIotEventHubConstruct } from "./modules/AzureIoAzureIotEventHubConstructtConstruct";
 
 
 class PowerControlStack extends TerraformStack {
@@ -23,11 +24,17 @@ class PowerControlStack extends TerraformStack {
       location: "EastAsia",
       name: prefix + "ResourceGroup"
     })
-    const azureIotConstruct = new AzureIotEventHubConstruct(this, "AzureIotEventHubConstruct", {
+    const azureIotConstruct = new AzureIotConstruct(this, "AzureIotConstruct", {
       environment,
       prefix,
       resourceGroup,
     })
+
+    // const azureIotConstruct = new AzureIotEventHubConstruct(this, "AzureIotEventHubConstruct", {
+    //   environment,
+    //   prefix,
+    //   resourceGroup,
+    // })
 
     const azureIotDeviceConstruct = new AzureIotDeviceConstruct(this, "AzureIotDeviceConstruct", {
       deviceId,
@@ -40,8 +47,8 @@ class PowerControlStack extends TerraformStack {
 
     const appSettings = {
       "IotHubPrimaryConnectionString": azureIotConstruct.iothubPrimaryConnectionString,
-      "EventHubPrimaryConnectionString": azureIotConstruct.eventhubPrimaryConnectionString,
-      "EventHubName": azureIotConstruct.eventhub.name,
+      // "EventHubPrimaryConnectionString": azureIotConstruct.eventhubPrimaryConnectionString,
+      // "EventHubName": azureIotConstruct.eventhub.name,
       "IotHubName": azureIotConstruct.iothub.name,
       "DeviceId": deviceId
     }

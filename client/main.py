@@ -51,6 +51,8 @@ async def main():
     async def twin_patch_handler(patch):
         print("the data in the desired properties patch was: {}".format(patch))
         await update_plug(patch)
+        patch.pop('$version',None)
+        await device_client.patch_twin_reported_properties(patch)
 
     # set the twin patch handler on the client
     device_client.on_twin_desired_properties_patch_received = twin_patch_handler
