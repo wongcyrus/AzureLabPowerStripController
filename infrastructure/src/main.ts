@@ -2,7 +2,7 @@ import { Construct } from "constructs";
 import { App, TerraformOutput, TerraformStack } from "cdktf";
 import { AzurermProvider, ResourceGroup } from "../.gen/providers/azurerm";
 
-import { AzureIotConstruct } from "./modules/AzureIotConstruct"
+import { AzureIotEventHubConstruct } from "./modules/AzureIotEventHubConstruct"
 import { AzureIotDeviceConstruct } from "./modules/AzureIoTDeviceConstruct";
 import { AzureFunctionLinuxConstruct } from "./modules/AzureFunctionLinuxConstruct";
 
@@ -23,7 +23,7 @@ class PowerControlStack extends TerraformStack {
       location: "EastAsia",
       name: prefix + "ResourceGroup"
     })
-    const azureIotConstruct = new AzureIotConstruct(this, "IotConstruct", {
+    const azureIotConstruct = new AzureIotEventHubConstruct(this, "AzureIotEventHubConstruct", {
       environment,
       prefix,
       resourceGroup,
