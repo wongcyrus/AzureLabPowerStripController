@@ -16,36 +16,36 @@ class PowerControlStack extends TerraformStack {
     })
 
     const prefix = "LabPowerControl"
-    const environment="dev"
-    const deviceId="LabPowerController"
+    const environment = "dev"
+    const deviceId = "LabPowerController"
 
     const resourceGroup = new ResourceGroup(this, "ResourceGroup", {
       location: "EastAsia",
       name: prefix + "ResourceGroup"
     })
-    const iotConstruct = new AzureIotConstruct(this, "IotConstruct", {
+    const azureIotConstruct = new AzureIotConstruct(this, "IotConstruct", {
       environment,
       prefix,
       resourceGroup,
     })
 
-    const azureIotDeviceConstruct = new AzureIotDeviceConstruct(this,"AzureIotDeviceConstruct",{
+    const azureIotDeviceConstruct = new AzureIotDeviceConstruct(this, "AzureIotDeviceConstruct", {
       deviceId,
-      iothub: iotConstruct.iothub,
+      iothub: azureIotConstruct.iothub,
       environment,
       prefix,
       resourceGroup,
     })
 
     const appSettings = {
-      "IOT_HUB_PRIMARY_CONNECTION_STRING": iotConstruct.iothubPrimaryConnectionString,
-      "EVENT_HUB_PRIMARY_CONNECTION_STRING": iotConstruct.eventhubPrimaryConnectionString,
-      "EVENTHUB_NAME": iotConstruct.eventhub.name,
-      "IOTHUB_NAME": iotConstruct.iothub.name,
+      "IotHubPrimaryConnectionString": azureIotConstruct.iothubPrimaryConnectionString,
+      "EventHubPrimaryConnectionString": azureIotConstruct.eventhubPrimaryConnectionString,
+      "EventHubName": azureIotConstruct.eventhub.name,
+      "IotHubName": azureIotConstruct.iothub.name,
       "DeviceId": deviceId
     }
 
-    const azureFunctionConstruct = new AzureFunctionLinuxConstruct(this,"AzureFunctionConstruct",{
+    const azureFunctionConstruct = new AzureFunctionLinuxConstruct(this, "AzureFunctionConstruct", {
       environment,
       prefix,
       resourceGroup,
@@ -53,12 +53,28 @@ class PowerControlStack extends TerraformStack {
     })
 
     new TerraformOutput(this, "FunctionAppHostname", {
-      value: azureFunctionConstruct.functionApp.defaultHostname
+      value: azureFunctionConstruct.functionApp.name
     });
 
-    new TerraformOutput(this, "deviceKey", {
+    new TerraformOutput(this, "DeviceKey", {
       value: azureIotDeviceConstruct.deviceKey
     });
+
+    new TerraformOutput(this, "Environment", {
+      value: environment
+    });
+
+    new TerraformOutput(this, "AzureWebJobsStorage", {
+      sensitive: true,   
+      value: azureFunctionConstruct.storageAccount.primaryConnectionString
+    });   
+
+    for (let [key, value] of Object.entries(appSettings)) {
+      new TerraformOutput(this, key, {
+        sensitive: true,      
+        value: value
+      });
+    }
 
   }
 }

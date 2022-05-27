@@ -12,6 +12,8 @@ export interface AzureFunctionLinuxConstructConfig {
 
 export class AzureFunctionLinuxConstruct extends Construct {
     public readonly functionApp: LinuxFunctionApp;
+    public readonly storageAccount: StorageAccount;
+
     constructor(
         scope: Construct,
         name: string,
@@ -40,7 +42,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
             lower: true,
             upper: false,
         })
-        const storageAccount = new StorageAccount(this, "StorageAccount", {
+        this.storageAccount = new StorageAccount(this, "StorageAccount", {
             name: suffix.result,
             location: config.resourceGroup.location,
             resourceGroupName: config.resourceGroup.name,
@@ -48,25 +50,27 @@ export class AzureFunctionLinuxConstruct extends Construct {
             accountReplicationType: "LRS"
         })
 
-        config.appSettings['FUNCTIONS_WORKER_RUNTIME'] = "dotnet"
-        config.appSettings['AzureWebJobsStorage'] = storageAccount.primaryConnectionString
-        config.appSettings['APPINSIGHTS_INSTRUMENTATIONKEY'] = applicationInsights.instrumentationKey
-        config.appSettings['WEBSITE_RUN_FROM_PACKAGE'] = "1"
-        config.appSettings['FUNCTIONS_WORKER_RUNTIME'] = "dotnet"
+        const appSettings = { ...config.appSettings};
+        appSettings['FUNCTIONS_WORKER_RUNTIME'] = "dotnet"
+        appSettings['AzureWebJobsStorage'] = this.storageAccount.primaryConnectionString
+        appSettings['APPINSIGHTS_INSTRUMENTATIONKEY'] = applicationInsights.instrumentationKey
+        appSettings['WEBSITE_RUN_FROM_PACKAGE'] = "1"
+        appSettings['FUNCTIONS_WORKER_RUNTIME'] = "dotnet"
+        appSettings['Environment'] = config.environment
 
         this.functionApp = new LinuxFunctionApp(this, "FunctionApp", {
             name: config.prefix + "FunctionApp",
             location: config.resourceGroup.location,
             resourceGroupName: config.resourceGroup.name,
             servicePlanId: appServicePlan.id,            
-            storageAccountName: storageAccount.name,
-            storageAccountAccessKey: storageAccount.primaryAccessKey,
+            storageAccountName: this.storageAccount.name,
+            storageAccountAccessKey: this.storageAccount.primaryAccessKey,
 
             identity: { type: "SystemAssigned" },
             lifecycle: {
                 ignoreChanges: ["app_settings[\"WEBSITE_RUN_FROM_PACKAGE\"]"]
             },
-            appSettings: config.appSettings,
+            appSettings: appSettings,
             siteConfig: {
             }
         })

@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 
 namespace PowerStripControllerFunctionApp
 {
-    public class Function1
+    public class IotHubTriggerFunction
     {
         private static HttpClient client = new HttpClient();
         
-        [FunctionName("Function1")]
+        [FunctionName(nameof(IotHubTriggerFunction))]
         public void Run([IoTHubTrigger("messages/events", Connection = "")]EventData message, ILogger log)
         {
             log.LogInformation($"C# IoT Hub trigger function processed a message: {Encoding.UTF8.GetString(message.Body.Array)}");
