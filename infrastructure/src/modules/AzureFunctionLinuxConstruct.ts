@@ -10,6 +10,7 @@ export interface AzureFunctionLinuxConstructConfig {
     readonly environment: string
     readonly resourceGroup: ResourceGroup
     readonly appSettings: { [key: string]: string }
+    readonly vsProjectPath: string    
     readonly skuName?: string
 }
 
@@ -84,7 +85,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
                 dependsOn: [this.functionApp]
             })
 
-        const vsProjectPath = path.join(__dirname, "../../../", "PowerStripController/PowerStripControllerFunctionApp");
+        const vsProjectPath = config.vsProjectPath;
         buildFunctionAppResource.addOverride("provisioner", [
             {
                 "local-exec": {
@@ -93,7 +94,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
                 },
             },
         ]);
-        const publishPath = path.join(__dirname, "../../../", "PowerStripController/PowerStripControllerFunctionApp/bin/Release/net6.0/publish");
+        const publishPath = path.join(vsProjectPath, "/bin/Release/net6.0/publish");
         const outputZip = path.join(publishPath, "../deployment.zip")
         const dataArchiveFile = new DataArchiveFile(this, "DataArchiveFile", {
             type: "zip",

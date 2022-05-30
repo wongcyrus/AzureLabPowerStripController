@@ -5,6 +5,7 @@ import { AzurermProvider, ResourceGroup } from "../.gen/providers/azurerm";
 import { AzureIotDeviceConstruct } from "./modules/AzureIoTDeviceConstruct";
 import { AzureFunctionLinuxConstruct } from "./modules/AzureFunctionLinuxConstruct";
 import { AzureIotConstruct } from "./modules/AzureIotConstruct";
+import path = require("path");
 // import { AzureIotEventHubConstruct } from "./modules/AzureIoAzureIotEventHubConstructtConstruct";
 
 
@@ -57,7 +58,8 @@ class PowerControlStack extends TerraformStack {
       environment,
       prefix,
       resourceGroup,
-      appSettings
+      appSettings,
+      vsProjectPath: path.join(__dirname, "../../", "PowerStripController/PowerStripControllerFunctionApp")
     })
 
     new TerraformOutput(this, "FunctionAppHostname", {
