@@ -1,6 +1,9 @@
 import { StringResource } from '@cdktf/provider-random'
 import { Construct } from 'constructs'
+import path = require('path')
 import { ResourceGroup, ApplicationInsights, ServicePlan, LinuxFunctionApp, StorageAccount } from "../../.gen/providers/azurerm"
+import { Resource } from "../../.gen/providers/null"
+import { DataArchiveFile } from "../../.gen/providers/archive"
 
 export interface AzureFunctionLinuxConstructConfig {
     readonly prefix: string
@@ -33,7 +36,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
             location: config.resourceGroup.location,
             resourceGroupName: config.resourceGroup.name,
             skuName: config.skuName ?? "Y1",
-            osType: "Linux",            
+            osType: "Linux",
         })
 
         const suffix = new StringResource(this, "Random", {
@@ -50,7 +53,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
             accountReplicationType: "LRS"
         })
 
-        const appSettings = { ...config.appSettings};
+        const appSettings = { ...config.appSettings };
         appSettings['FUNCTIONS_WORKER_RUNTIME'] = "dotnet"
         appSettings['AzureWebJobsStorage'] = this.storageAccount.primaryConnectionString
         appSettings['APPINSIGHTS_INSTRUMENTATIONKEY'] = applicationInsights.instrumentationKey
@@ -62,7 +65,7 @@ export class AzureFunctionLinuxConstruct extends Construct {
             name: config.prefix + "FunctionApp",
             location: config.resourceGroup.location,
             resourceGroupName: config.resourceGroup.name,
-            servicePlanId: appServicePlan.id,            
+            servicePlanId: appServicePlan.id,
             storageAccountName: this.storageAccount.name,
             storageAccountAccessKey: this.storageAccount.primaryAccessKey,
 
@@ -74,6 +77,46 @@ export class AzureFunctionLinuxConstruct extends Construct {
             siteConfig: {
             }
         })
+
+        const buildFunctionAppResource = new Resource(this, "BuildFunctionAppResource",
+            {
+                triggers: { build_number: "${timestamp()}" },
+                dependsOn: [this.functionApp]
+            })
+
+        const vsProjectPath = path.join(__dirname, "../../../", "PowerStripController/PowerStripControllerFunctionApp");
+        buildFunctionAppResource.addOverride("provisioner", [
+            {
+                "local-exec": {
+                    working_dir: vsProjectPath,
+                    command: "dotnet publish -p:PublishProfile=FolderProfile"
+                },
+            },
+        ]);
+        const publishPath = path.join(__dirname, "../../../", "PowerStripController/PowerStripControllerFunctionApp/bin/Release/net6.0/publish");
+        const outputZip = path.join(publishPath, "../deployment.zip")
+        const dataArchiveFile = new DataArchiveFile(this, "DataArchiveFile", {
+            type: "zip",
+            sourceDir: publishPath,
+            outputPath: outputZip,
+            dependsOn: [buildFunctionAppResource]
+        })
+
+        const publishFunctionAppResource = new Resource(this, "PublishFunctionAppResource",
+            {
+                triggers: { build_number: "${timestamp()}" },
+                dependsOn: [dataArchiveFile]
+            })
+
+        publishFunctionAppResource.addOverride("provisioner", [
+            {
+                "local-exec": {
+                    command: `az functionapp deployment source config-zip --resource-group ${config.resourceGroup.name} --name ${this.functionApp.name} --src ${dataArchiveFile.outputPath}`
+                },
+            },
+        ]);
+
+
 
     }
 }

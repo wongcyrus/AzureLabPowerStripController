@@ -7,7 +7,8 @@
     "azuread@~>2.22.0",
     "random@~>3.2.0",
     "null@~>3.1.1",
-    "external@~>2.2.2"
+    "external@~>2.2.2",
+    "archive@~>2.2.0"
   ],
   "terraformModules": [],
   "context": {

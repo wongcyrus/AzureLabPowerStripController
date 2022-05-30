@@ -1,13 +1,11 @@
 # Development Setup Overview
 1. Install chocolatey.
-2. Using chocolatey install Terraform
-3. Using chocolatey install node.js 
-5. Using chocolatey install jq
-5. Install yarn
-6. Install npx
-7. Install cdktf ```npm run upgrade``` and ```npm i -g cdktf@latest cdktf-cli@latest```
-8. Install Az.IotHub with administration Powershell ```Install-Module -Name Az.IotHub -Force -AllowClobber```
-9. Run ```Connect-AzAccount```
+2. Using chocolatey install Terraform, node.js, jq, Python, OpenJDK, Maven
+3. Install yarn
+4. Install npx
+5. Install cdktf ```npm run upgrade``` and ```npm i -g cdktf@latest cdktf-cli@latest```
+6. Install Az.IotHub with administration Powershell ```Install-Module -Name Az.IotHub -Force -AllowClobber```
+7. Run ```Connect-AzAccount```
 
 # Deploy
 Open the first terminal, and run ```npm run watch``` to complie TypeScript.
