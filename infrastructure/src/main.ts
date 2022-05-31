@@ -1,10 +1,10 @@
 import { Construct } from "constructs";
 import { App, TerraformOutput, TerraformStack } from "cdktf";
-import { AzurermProvider, ResourceGroup } from "../.gen/providers/azurerm";
+import { AzurermProvider, ResourceGroup } from "azure-common-construct/.gen/providers/azurerm";
 
-import { AzureIotDeviceConstruct } from "./modules/AzureIoTDeviceConstruct";
-import { AzureFunctionLinuxConstruct } from "./modules/AzureFunctionLinuxConstruct";
-import { AzureIotConstruct } from "./modules/AzureIotConstruct";
+import { AzureIotDeviceConstruct } from "azure-common-construct/patterns/AzureIoTDeviceConstruct";
+import { AzureFunctionLinuxConstruct } from "azure-common-construct/patterns/AzureFunctionLinuxConstruct";
+import { AzureIotConstruct } from "azure-common-construct/patterns/AzureIotConstruct";
 import path = require("path");
 // import { AzureIotEventHubConstruct } from "./modules/AzureIoAzureIotEventHubConstructtConstruct";
 
