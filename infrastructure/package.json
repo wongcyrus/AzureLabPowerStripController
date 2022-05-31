@@ -28,11 +28,6 @@
     "node": ">=14.0"
   },
   "dependencies": {
-    "@cdktf/provider-archive": "^0.5.7",
-    "@cdktf/provider-azurerm": "^0.7.7",
-    "@cdktf/provider-external": "^0.6.7",
-    "@cdktf/provider-null": "^0.7.7",
-    "@cdktf/provider-random": "^0.3.7",
     "cdktf": "^0.11.0",
     "constructs": "^10.1.22"
   },

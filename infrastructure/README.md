@@ -11,7 +11,7 @@
 Open the first terminal, and run ```npm run watch``` to complie TypeScript.
 
 Open the second terminal,
-1. Run ```cdkth get```
+1. Run ```cdktf get```
 2. Run ```cdktf deploy --auto-approve```
 
 

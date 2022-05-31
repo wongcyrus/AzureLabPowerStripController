@@ -1,4 +1,4 @@
-import { StringResource } from '@cdktf/provider-random'
+import { StringResource } from '../../.gen/providers/random'
 import { Construct } from 'constructs'
 import path = require('path')
 import { ResourceGroup, ApplicationInsights, ServicePlan, LinuxFunctionApp, StorageAccount } from "../../.gen/providers/azurerm"
