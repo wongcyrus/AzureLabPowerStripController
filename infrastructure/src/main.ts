@@ -1,13 +1,11 @@
 import { Construct } from "constructs";
 import { App, TerraformOutput, TerraformStack } from "cdktf";
-import { AzurermProvider, ResourceGroup } from "azure-common-construct/.gen/providers/azurerm";
+import { AzurermProvider, ResourceGroup } from "cdktf-azure-providers/.gen/providers/azurerm";
 
 import { AzureIotDeviceConstruct } from "azure-common-construct/patterns/AzureIoTDeviceConstruct";
-import { AzureFunctionLinuxConstruct } from "azure-common-construct/patterns/AzureFunctionLinuxConstruct";
+import { AzureFunctionLinuxConstruct, PublishMode } from "azure-common-construct/patterns/AzureFunctionLinuxConstruct";
 import { AzureIotConstruct } from "azure-common-construct/patterns/AzureIotConstruct";
 import path = require("path");
-// import { AzureIotEventHubConstruct } from "./modules/AzureIoAzureIotEventHubConstructtConstruct";
-
 
 class PowerControlStack extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -31,12 +29,6 @@ class PowerControlStack extends TerraformStack {
       resourceGroup,
     })
 
-    // const azureIotConstruct = new AzureIotEventHubConstruct(this, "AzureIotEventHubConstruct", {
-    //   environment,
-    //   prefix,
-    //   resourceGroup,
-    // })
-
     const azureIotDeviceConstruct = new AzureIotDeviceConstruct(this, "AzureIotDeviceConstruct", {
       deviceId,
       iothub: azureIotConstruct.iothub,
@@ -48,8 +40,6 @@ class PowerControlStack extends TerraformStack {
 
     const appSettings = {
       "IotHubPrimaryConnectionString": azureIotConstruct.iothubPrimaryConnectionString,
-      // "EventHubPrimaryConnectionString": azureIotConstruct.eventhubPrimaryConnectionString,
-      // "EventHubName": azureIotConstruct.eventhub.name,
       "IotHubName": azureIotConstruct.iothub.name,
       "DeviceId": deviceId
     }
@@ -59,7 +49,8 @@ class PowerControlStack extends TerraformStack {
       prefix,
       resourceGroup,
       appSettings,
-      vsProjectPath: path.join(__dirname, "../../", "PowerStripController/PowerStripControllerFunctionApp")
+      vsProjectPath: path.join(__dirname, "../../", "PowerStripController/PowerStripControllerFunctionApp"),
+      publishMode: PublishMode.AfterCodeChange
     })
 
     new TerraformOutput(this, "FunctionAppHostname", {
