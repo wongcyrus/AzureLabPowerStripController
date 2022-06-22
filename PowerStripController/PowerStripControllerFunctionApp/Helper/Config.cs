@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
+using System;
 
 namespace PowerStripControllerFunctionApp.Helper;
 

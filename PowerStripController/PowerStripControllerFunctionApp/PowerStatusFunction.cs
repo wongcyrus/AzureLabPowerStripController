@@ -1,14 +1,12 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Devices;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Microsoft.Azure.Devices;
 using PowerStripControllerFunctionApp.Helper;
+using System.Threading.Tasks;
 
 namespace PowerStripControllerFunctionApp
 {
@@ -24,7 +22,7 @@ namespace PowerStripControllerFunctionApp
             var config = new Config(context);
             using var client = ServiceClient.CreateFromConnectionString(config.GetConfig(Config.Key.IotHubPrimaryConnectionString));
             using var manager = RegistryManager.CreateFromConnectionString(config.GetConfig(Config.Key.IotHubPrimaryConnectionString));
-            var twin = await manager.GetTwinAsync(config.GetConfig(Config.Key.DeviceId));          
+            var twin = await manager.GetTwinAsync(config.GetConfig(Config.Key.DeviceId));
 
             return new OkObjectResult(JsonConvert.SerializeObject(twin.Properties.Reported));
         }

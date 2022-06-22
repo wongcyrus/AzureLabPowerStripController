@@ -44,18 +44,26 @@ class PowerControlStack extends TerraformStack {
       "DeviceId": deviceId
     }
 
+    const functionNames= ["PowerControlFunction","PowerStatusFunction"];
     const azureFunctionConstruct = new AzureFunctionLinuxConstruct(this, "AzureFunctionConstruct", {
       environment,
       prefix,
       resourceGroup,
       appSettings,
       vsProjectPath: path.join(__dirname, "../../", "PowerStripController/PowerStripControllerFunctionApp"),
-      publishMode: PublishMode.AfterCodeChange
+      publishMode: PublishMode.Always,
+      functionNames
     })
 
     new TerraformOutput(this, "FunctionAppHostname", {
       value: azureFunctionConstruct.functionApp.name
     });
+
+    for(const functionName of functionNames){
+      new TerraformOutput(this, functionName+"Url", {
+        value: azureFunctionConstruct.functionUrls![functionName]
+      });
+    }
 
     new TerraformOutput(this, "DeviceKey", {
       value: azureIotDeviceConstruct.deviceKey
