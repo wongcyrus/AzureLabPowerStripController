@@ -12,7 +12,11 @@ class PowerControlStack extends TerraformStack {
     super(scope, name);
 
     new AzurermProvider(this, "AzureRm", {
-      features: {}
+      features: {
+        resourceGroup: {
+          preventDeletionIfContainsResources: false
+        }
+      }
     })
 
     const prefix = "LabPowerControl"
@@ -44,7 +48,7 @@ class PowerControlStack extends TerraformStack {
       "DeviceId": deviceId
     }
 
-    const functionNames= ["PowerControlFunction","PowerStatusFunction"];
+    const functionNames = ["PowerControlFunction", "PowerStatusFunction"];
     const azureFunctionConstruct = new AzureFunctionLinuxConstruct(this, "AzureFunctionConstruct", {
       environment,
       prefix,
@@ -59,8 +63,8 @@ class PowerControlStack extends TerraformStack {
       value: azureFunctionConstruct.functionApp.name
     });
 
-    for(const functionName of functionNames){
-      new TerraformOutput(this, functionName+"Url", {
+    for (const functionName of functionNames) {
+      new TerraformOutput(this, functionName + "Url", {
         value: azureFunctionConstruct.functionUrls![functionName]
       });
     }
@@ -74,13 +78,13 @@ class PowerControlStack extends TerraformStack {
     });
 
     new TerraformOutput(this, "AzureWebJobsStorage", {
-      sensitive: true,   
+      sensitive: true,
       value: azureFunctionConstruct.storageAccount.primaryConnectionString
-    });   
+    });
 
     for (let [key, value] of Object.entries(appSettings)) {
       new TerraformOutput(this, key, {
-        sensitive: true,      
+        sensitive: true,
         value: value
       });
     }
